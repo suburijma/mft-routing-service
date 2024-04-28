@@ -60,13 +60,14 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 
 	@Override
 	public SFTPGoTokenResponse getTokenDetails(SFTPGoTokenRequest tokenRequest) {
-		logger.debug("Inside MFTRoutingServiceImpl >> getTokenDetails");
-		logger.debug("==============***************************************====================");
-		logger.debug("==============STARTED TOKEN SERVICE====================");
+		logger.info("Inside MFTRoutingServiceImpl >> getTokenDetails");
+		logger.info("==============***************************************====================");
+		logger.info("==============STARTED TOKEN SERVICE====================");
 		try {
 			String auth = tokenRequest.getUserName() + ":" + tokenRequest.getPassword();
 			byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
 			String authHeader = "Basic " + new String(encodedAuth);
+			logger.info("authHeader : " + authHeader);
 			
 			HttpHeaders header = new HttpHeaders();
 			header.setContentType(MediaType.APPLICATION_JSON);
@@ -76,10 +77,10 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 			HttpEntity<?> req = new HttpEntity<>(header);
 			
 			ResponseEntity<SFTPGoTokenResponse> response = new RestTemplate().exchange("http://10.28.79.7/api/v2/user/token", HttpMethod.GET, req, SFTPGoTokenResponse.class);
-			logger.debug("==============***************************************====================");
-			logger.debug(response.getBody().getAccessToken());
-			logger.debug("==============End TOKEN SERVICE====================");
-			logger.debug("*************************" + sftpgourl);
+			logger.info("==============***************************************====================");
+			logger.info(response.getBody().getAccessToken());
+			logger.info("==============End TOKEN SERVICE====================");
+			logger.info("*************************" + sftpgourl);
 			return response.getBody();
 		}catch(Exception e) {
 			logger.error(e.getMessage());

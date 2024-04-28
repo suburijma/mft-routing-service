@@ -33,13 +33,13 @@ public class MFTRoutingServiceController {
 
 	@GetMapping("/greet")
 	public @ResponseBody String welcome() {
-		logger.debug("Inside MFTRoutingServiceController >> welcome");
+		logger.info("Inside MFTRoutingServiceController >> welcome");
 		return "welcome";
 	}
 	
 	@PostMapping("/token")
 	public @ResponseBody SFTPGoTokenResponse getToken(@RequestBody(required=true) SFTPGoTokenRequest tokenRequest) {
-		logger.debug("Inside MFTRoutingServiceController >> getToken");
+		logger.info("Inside MFTRoutingServiceController >> getToken");
 		
 		SFTPGoTokenResponse response = imft_Routing_Service.getTokenDetails(tokenRequest);
 		return null;
