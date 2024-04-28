@@ -1,0 +1,8 @@
+com/mft/routing/service/impl/MFTRoutingServiceImpl.class
+com/mft/routing/service/IMFTRoutingService.class
+com/mft/MftRoutingServiceApplication.class
+com/mft/routing/controller/MFTRoutingServiceController.class
+com/mft/routing/request/model/SFTPGoTokenRequest.class
+com/mft/routing/response/SFTPGoTokenResponse.class
+com/mft/routing/request/model/SFTPGoUploadRequest.class
+com/mft/routing/dto/SFTPGo_Upload_DTO.class
