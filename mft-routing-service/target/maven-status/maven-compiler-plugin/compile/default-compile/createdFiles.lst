@@ -1,5 +1,6 @@
 com/mft/routing/service/impl/MFTRoutingServiceImpl.class
 com/mft/routing/service/IMFTRoutingService.class
+com/mft/routing/dao/MFTRoutingServiceDAO.class
 com/mft/MftRoutingServiceApplication.class
 com/mft/SwaggerConfig.class
 com/mft/routing/controller/MFTRoutingServiceController.class

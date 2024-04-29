@@ -11,6 +11,7 @@ import javax.xml.ws.soap.MTOM;
 import org.apache.commons.net.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -23,6 +24,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mft.routing.dao.MFTRoutingServiceDAO;
 import com.mft.routing.dto.SFTPGo_Upload_DTO;
 import com.mft.routing.request.model.SFTPGoTokenRequest;
 import com.mft.routing.response.SFTPGoTokenResponse;
@@ -37,9 +39,13 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 	
 	@Value( "${sftpgourl}" )
 	private String sftpgourl;
+	
+	@Autowired
+	MFTRoutingServiceDAO mftRoutingServiceDAO;
 
 	@Override
-	public SFTPGo_Upload_DTO uploadFiles(String path, Boolean mk_dir, MultipartFile file) {
+	public SFTPGo_Upload_DTO uploadFiles(String url,
+			String path, Boolean mk_dir, MultipartFile file) {
 		logger.info("Inside MFT_Routing_ServiceImpl >> uploadFiles");
 
 		HttpHeaders headers = new HttpHeaders();
@@ -48,9 +54,10 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 
 		MultiValueMap<String, Object> filenames = new LinkedMultiValueMap<>();
 		filenames.add("file", file);
+		//TODO : SFTPGoTokenResponse getToken();
 
 		HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(filenames, headers);
-		String serverUrl = "https://sftpgo.stoplight.io/api/v2/user/files?path=test1.txt&mkdir_parents=false";
+		String serverUrl = url+"path=test1.txt&mkdir_parents=false";
 		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<SFTPGo_Upload_DTO> response = restTemplate.postForEntity(serverUrl, requestEntity, SFTPGo_Upload_DTO.class);
 
@@ -80,12 +87,21 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 			logger.info("==============***************************************====================");
 			logger.info(response.getBody().getAccessToken());
 			logger.info("==============End TOKEN SERVICE====================");
-			logger.info("*************************" + sftpgourl);
 			return response.getBody();
 		}catch(Exception e) {
 			logger.error(e.getMessage());
 			return null;
 		}
+	}
+
+	@Override
+	public String getToolDetails(String userName) {
+		logger.info("Inside MFTRoutingServiceImpl >> getToolDetails");
+		logger.info("==============***************************************====================");
+		logger.info("==============Get Tool Details====================");
+		
+		String toolName = mftRoutingServiceDAO.getToolInfo(userName);
+		return toolName;
 	}
 
 }

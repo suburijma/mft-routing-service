@@ -5,5 +5,6 @@
 /Users/apple/Documents/my_ws1/mft-routing-service/src/main/java/com/mft/MftRoutingServiceApplication.java
 /Users/apple/Documents/my_ws1/mft-routing-service/src/main/java/com/mft/SwaggerConfig.java
 /Users/apple/Documents/my_ws1/mft-routing-service/src/main/java/com/mft/routing/service/IMFTRoutingService.java
+/Users/apple/Documents/my_ws1/mft-routing-service/src/main/java/com/mft/routing/dao/MFTRoutingServiceDAO.java
 /Users/apple/Documents/my_ws1/mft-routing-service/src/main/java/com/mft/routing/request/model/SFTPGoUploadRequest.java
 /Users/apple/Documents/my_ws1/mft-routing-service/src/main/java/com/mft/routing/response/SFTPGoTokenResponse.java

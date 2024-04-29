@@ -14,8 +14,10 @@ import com.mft.routing.response.SFTPGoTokenResponse;
  */
 public interface IMFTRoutingService {
 
-	SFTPGo_Upload_DTO uploadFiles(String path, Boolean mk_dir, MultipartFile file);
+	SFTPGo_Upload_DTO uploadFiles(String url, String path, Boolean mk_dir, MultipartFile file);
 
 	SFTPGoTokenResponse getTokenDetails(SFTPGoTokenRequest tokenRequest);
+
+	String getToolDetails(String userName);
 
 }
