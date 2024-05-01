@@ -3,6 +3,8 @@
  */
 package com.mft.routing.controller;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +14,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mft.routing.dto.SFTPGoUploadDTO;
 import com.mft.routing.request.model.SFTPGoTokenRequest;
+import com.mft.routing.request.model.SFTPGoUploadRequest;
 import com.mft.routing.response.SFTPGoTokenResponse;
 import com.mft.routing.service.IMFTRoutingService;
 
@@ -67,7 +71,8 @@ public class MFTRoutingServiceController {
 	@PostMapping("/saveFile")
 	public @ResponseBody SFTPGoUploadDTO saveFile(@RequestParam("userName") String userName,
 			@RequestParam("path") String path, @RequestParam("mkdir_parents") boolean mkdir_parents,
-			@RequestBody MultipartFile filenames) {
+			@RequestPart MultipartFile filenames
+			) {
 		logger.info("Inside MFTRoutingServiceController >> uploadFiles");
 
 		String toolName = imftRoutingService.getToolDetails("userName");
@@ -77,4 +82,5 @@ public class MFTRoutingServiceController {
 		SFTPGoUploadDTO respone = imftRoutingService.saveFile(uploadAPI, path, mkdir_parents, filenames);
 		return null;
 	}
+	
 }
