@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.mft.routing.dto.SFTPGo_Upload_DTO;
+import com.mft.routing.dto.SFTPGoUploadDTO;
 import com.mft.routing.request.model.SFTPGoTokenRequest;
 import com.mft.routing.response.SFTPGoTokenResponse;
 import com.mft.routing.service.IMFTRoutingService;
@@ -31,7 +31,7 @@ public class MFTRoutingServiceController {
 
 	@Autowired
 	IMFTRoutingService imftRoutingService;
-	
+
 	@Autowired
 	private Environment env;
 
@@ -41,25 +41,40 @@ public class MFTRoutingServiceController {
 		logger.info(env.getProperty("user1"));
 		return "welcome";
 	}
-	
+
 	@PostMapping("/token")
-	public @ResponseBody SFTPGoTokenResponse getToken(@RequestBody(required=true) SFTPGoTokenRequest tokenRequest) {
+	public @ResponseBody SFTPGoTokenResponse getToken(@RequestBody(required = true) SFTPGoTokenRequest tokenRequest) {
 		logger.info("Inside MFTRoutingServiceController >> getToken");
-		
+
 		SFTPGoTokenResponse response = imftRoutingService.getTokenDetails(tokenRequest);
 		return response;
 	}
 
 	@PostMapping("/uploadFile")
-	public @ResponseBody SFTPGo_Upload_DTO uploadFiles(@RequestParam("userName") String userName, @RequestParam("path") String path,
-			@RequestParam("mkdir_parents") boolean mkdir_parents, @RequestBody MultipartFile filenames) {
+	public @ResponseBody SFTPGoUploadDTO uploadFiles(@RequestParam("userName") String userName,
+			@RequestParam("path") String path, @RequestParam("mkdir_parents") boolean mkdir_parents,
+			@RequestBody MultipartFile filenames) {
 		logger.info("Inside MFTRoutingServiceController >> uploadFiles");
-		
+
 		String toolName = imftRoutingService.getToolDetails("userName");
-		String uploadAPI = env.getProperty(toolName+".upload");
-		logger.info("Upload url >>>>> " + env.getProperty(toolName+".upload") );
-		
+		String uploadAPI = env.getProperty(toolName + ".upload");
+		logger.info("Upload url >>>>> " + env.getProperty(toolName + ".upload"));
+
 		imftRoutingService.uploadFiles(uploadAPI, path, mkdir_parents, filenames);
+		return null;
+	}
+	
+	@PostMapping("/saveFile")
+	public @ResponseBody SFTPGoUploadDTO saveFile(@RequestParam("userName") String userName,
+			@RequestParam("path") String path, @RequestParam("mkdir_parents") boolean mkdir_parents,
+			@RequestBody MultipartFile filenames) {
+		logger.info("Inside MFTRoutingServiceController >> uploadFiles");
+
+		String toolName = imftRoutingService.getToolDetails("userName");
+		String uploadAPI = env.getProperty(toolName + ".upload");
+		logger.info("Upload url >>>>> " + env.getProperty(toolName + ".upload"));
+
+		SFTPGoUploadDTO respone = imftRoutingService.saveFile(uploadAPI, path, mkdir_parents, filenames);
 		return null;
 	}
 }
