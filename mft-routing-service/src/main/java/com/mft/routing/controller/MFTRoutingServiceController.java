@@ -3,8 +3,6 @@
  */
 package com.mft.routing.controller;
 
-import javax.validation.Valid;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +17,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mft.enums.MFTRoutingServiceEnum;
 import com.mft.routing.dto.SFTPGoUploadDTO;
 import com.mft.routing.request.model.SFTPGoTokenRequest;
-import com.mft.routing.request.model.SFTPGoUploadRequest;
 import com.mft.routing.response.SFTPGoTokenResponse;
 import com.mft.routing.service.IMFTRoutingService;
+import com.mft.utility.ToolAPIDetail;
 
 /**
  * 
@@ -35,6 +34,9 @@ public class MFTRoutingServiceController {
 
 	@Autowired
 	IMFTRoutingService imftRoutingService;
+	
+	@Autowired
+	ToolAPIDetail toolAPIDetail;
 
 	@Autowired
 	private Environment env;
@@ -67,20 +69,20 @@ public class MFTRoutingServiceController {
 		imftRoutingService.uploadFiles(uploadAPI, path, mkdir_parents, filenames);
 		return null;
 	}
-	
+
 	@PostMapping("/saveFile")
 	public @ResponseBody SFTPGoUploadDTO saveFile(@RequestParam("userName") String userName,
 			@RequestParam("path") String path, @RequestParam("mkdir_parents") boolean mkdir_parents,
-			@RequestPart MultipartFile filenames
-			) {
+			@RequestPart MultipartFile filenames) {
 		logger.info("Inside MFTRoutingServiceController >> uploadFiles");
 
-		String toolName = imftRoutingService.getToolDetails("userName");
-		String uploadAPI = env.getProperty(toolName + ".upload");
+		String toolName = env.getProperty(userName);
+		String uploadURL = toolAPIDetail.getToolAPI(toolName, MFTRoutingServiceEnum._upload.name());
+		//String uploadAPI = env.getProperty(toolName + ".upload");
 		logger.info("Upload url >>>>> " + env.getProperty(toolName + ".upload"));
 
-		SFTPGoUploadDTO respone = imftRoutingService.saveFile(uploadAPI, path, mkdir_parents, filenames);
+		SFTPGoUploadDTO respone = imftRoutingService.saveFile(uploadURL, path, mkdir_parents, filenames);
 		return null;
 	}
-	
+
 }

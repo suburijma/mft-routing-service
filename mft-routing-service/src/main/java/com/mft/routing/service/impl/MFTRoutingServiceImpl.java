@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -39,6 +40,9 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 
 	@Value("${sftpgourl}")
 	private String sftpgourl;
+	
+	@Autowired
+	private Environment env;
 
 	@Autowired
 	MFTRoutingServiceDAO mftRoutingServiceDAO;
@@ -111,27 +115,28 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 	@Override
 	public SFTPGoUploadDTO saveFile(String uploadAPI, String path, boolean mkdir_parents, MultipartFile file) {
 		logger.info("Inside MFT_Routing_ServiceImpl >> saveFile");
+		logger.info("uploadAPI "+ uploadAPI);
 
 		SFTPGoTokenRequest tokenRequest = new SFTPGoTokenRequest();
 		tokenRequest.setUserName("user1");
 		tokenRequest.setPassword("Rijma@856411");
 
-		SFTPGoTokenResponse response = getTokenDetails(tokenRequest);
-		String authHeader = "Bearer " + response.getAccessToken();
-		logger.info("authHeader : " + authHeader);
+		//SFTPGoTokenResponse response = getTokenDetails(tokenRequest);
+		//String authHeader = "Bearer " + response.getAccessToken();
+		//logger.info("authHeader : " + authHeader);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-		headers.setContentType(MediaType.ALL);
+		//headers.setContentType(MediaType.ALL);
 		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-		headers.set("Authorization", authHeader);
+		//headers.set("Authorization", authHeader);
 		logger.info("Inside MFT_Routing_ServiceImpl >> header");
 
 		String contentType = file.getContentType();
 		Resource files = file.getResource();
 
 		MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
-		multipartBodyBuilder.part(file.getName(), files, MediaType.ALL);
+		multipartBodyBuilder.part(file.getName(), files, MediaType.APPLICATION_JSON);
 		logger.info("Inside MFT_Routing_ServiceImpl >> MultipartBodyBuilder");
 
 		// multipart/form-data request body
