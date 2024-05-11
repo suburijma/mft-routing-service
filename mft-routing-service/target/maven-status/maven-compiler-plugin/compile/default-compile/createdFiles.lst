@@ -11,4 +11,5 @@ com/mft/routing/service/IMFTRoutingService.class
 com/mft/utility/FileUploadUtil.class
 com/mft/routing/dto/SFTPGoUploadDTO.class
 com/mft/constant/MFTRoutingServiceConstant.class
+com/mft/routing/service/impl/MFTRoutingServiceImpl$1.class
 com/mft/routing/request/model/SFTPGoUploadRequest.class

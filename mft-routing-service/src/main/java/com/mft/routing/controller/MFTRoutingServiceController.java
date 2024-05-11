@@ -59,14 +59,15 @@ public class MFTRoutingServiceController {
 	@PostMapping("/uploadFile")
 	public @ResponseBody SFTPGoUploadDTO uploadFiles(@RequestParam("userName") String userName,
 			@RequestParam("path") String path, @RequestParam("mkdir_parents") boolean mkdir_parents,
-			@RequestBody MultipartFile filenames) {
+			@RequestPart MultipartFile filenames) {
 		logger.info("Inside MFTRoutingServiceController >> uploadFiles");
 
-		String toolName = imftRoutingService.getToolDetails("userName");
-		String uploadAPI = env.getProperty(toolName + ".upload");
+		String toolName = env.getProperty(userName);
+		String uploadURL = toolAPIDetail.getToolAPI(toolName, MFTRoutingServiceEnum._upload.name());
+		// String uploadAPI = env.getProperty(toolName + ".upload");
 		logger.info("Upload url >>>>> " + env.getProperty(toolName + ".upload"));
 
-		imftRoutingService.uploadFiles(uploadAPI, path, mkdir_parents, filenames);
+		SFTPGoUploadDTO respone = imftRoutingService.uploadFiles(uploadURL, path, mkdir_parents, filenames);
 		return null;
 	}
 

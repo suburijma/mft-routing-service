@@ -3,7 +3,9 @@
  */
 package com.mft.routing.service.impl;
 
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -51,25 +53,57 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 	MFTRoutingServiceDAO mftRoutingServiceDAO;
 
 	@Override
-	public SFTPGoUploadDTO uploadFiles(String url, String path, Boolean mk_dir, MultipartFile file) {
-		logger.info("Inside MFT_Routing_ServiceImpl >> uploadFiles");
+	public SFTPGoUploadDTO uploadFiles(String uploadAPI, String path, boolean mkdir_parents, MultipartFile file) {
+		logger.info("Inside MFT_Routing_ServiceImpl >> saveFile");
+		logger.info("uploadAPI " + uploadAPI);
+
+		SFTPGoTokenRequest tokenRequest = new SFTPGoTokenRequest();
+		tokenRequest.setUserName("user1");
+		tokenRequest.setPassword("Rijma@856411");
+
+		SFTPGoTokenResponse response = getTokenDetails(tokenRequest);
+		String authHeader = "Bearer " + response.getAccessToken();
+		logger.info("authHeader : " + authHeader);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-		headers.setContentType(MediaType.ALL);
+		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+		// headers.set("Authorization", authHeader);
+		logger.info("Inside MFT_Routing_ServiceImpl >> header");
 
-		MultiValueMap<String, Object> filenames = new LinkedMultiValueMap<>();
-		filenames.add("file", file);
-		// TODO : SFTPGoTokenResponse getToken();
-
-		HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(filenames, headers);
-		String serverUrl = url + "path=test1.txt&mkdir_parents=false";
-		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<SFTPGoUploadDTO> response = restTemplate.postForEntity(serverUrl, requestEntity,
-				SFTPGoUploadDTO.class);
-
-		logger.info("Checking the response" + response.getBody().toString());
-		return response.getBody();
+		// changes now
+		FileUploadUtil fileUpload = new FileUploadUtil();
+		File savedFile;
+		ResponseEntity<SFTPGoUploadDTO> responseEntity;
+		try {
+			savedFile = fileUpload.saveFile(file.getName(), file);
+			logger.info("savedFile : " + savedFile.getAbsolutePath());
+			
+			
+			MultiValueMap<String, Object> data = new LinkedMultiValueMap<String, Object>();
+			ByteArrayResource resource = new ByteArrayResource(file.getBytes()) {
+			        @Override
+			        public String getFilename() {
+			            return file.getName();
+			        }
+			};
+			data.add("file", resource);
+			
+			HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<MultiValueMap<String, Object>>(data, headers);	
+            RestTemplate restTemplate = new RestTemplate();    
+               
+	        responseEntity = restTemplate.postForEntity(
+	       		 "http://10.28.79.7/api/v2/user/files?path=image3.png&mkdir_parents=false",
+	       		requestEntity, SFTPGoUploadDTO.class);
+	        logger.info("*********************&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&********************************");
+	        return responseEntity.getBody();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			logger.error("Something Failed@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+			e.printStackTrace();
+		}
+		return null;
+	        
 	}
 
 	@Override
@@ -141,58 +175,42 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 		try {
 			savedFile = fileUpload.saveFile(file.getName(), file);
 			logger.info("savedFile : " + savedFile.getAbsolutePath());
-			
-			FileSystemResource fileSystemResource = new FileSystemResource(savedFile);
-	        MultiValueMap<String, Object> fileUploadMap = new LinkedMultiValueMap<>();
-	        fileUploadMap.set("filenames", fileSystemResource);
 
-	        HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(fileUploadMap, headers);
-	        RestTemplate restTemplate = new RestTemplate();
-	        
-	        
-	        responseEntity = restTemplate.postForEntity(
-	       		 "http://10.28.79.7/api/v2/user/files?path=image3.png&mkdir_parents=false",
-	       		 httpEntity, SFTPGoUploadDTO.class);
-	        logger.info("*********************&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&********************************");
-	        return responseEntity.getBody();
+			FileSystemResource fileSystemResource = new FileSystemResource(savedFile);
+			MultiValueMap<String, Object> fileUploadMap = new LinkedMultiValueMap<>();
+			fileUploadMap.set("filenames", fileSystemResource);
+
+			HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(fileUploadMap, headers);
+			RestTemplate restTemplate = new RestTemplate();
+
+			responseEntity = restTemplate.postForEntity(
+					"http://10.28.79.7/api/v2/user/files?path=image3.png&mkdir_parents=false", httpEntity,
+					SFTPGoUploadDTO.class);
+			logger.info("*********************&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&********************************");
+			return responseEntity.getBody();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			logger.error("Something Failed@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 			e.printStackTrace();
 		}
 		return null;
-	        
-			
-			
-			
-			
-			
-			
-			
-			
 
-	/*		ByteArrayResource fileAsResource = new ByteArrayResource(file.getBytes()) {
-				@Override
-				public String getFilename() {
-					return file.getOriginalFilename();
-				}
-			};
-
-			final MultiValueMap<String, Object> fileUploadMap = new LinkedMultiValueMap<>();
-			fileUploadMap.set("file", fileAsResource);
-
-			HttpEntity<ByteArrayResource> attachmentPart;
-			ByteArrayResource fileAsResource1 = new ByteArrayResource(file.getBytes()) {
-				@Override
-				public String getFilename() {
-					return file.getOriginalFilename();
-				}
-			};
-			attachmentPart = new HttpEntity<>(fileAsResource1, headers);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
+		/*
+		 * ByteArrayResource fileAsResource = new ByteArrayResource(file.getBytes()) {
+		 * 
+		 * @Override public String getFilename() { return file.getOriginalFilename(); }
+		 * };
+		 * 
+		 * final MultiValueMap<String, Object> fileUploadMap = new
+		 * LinkedMultiValueMap<>(); fileUploadMap.set("file", fileAsResource);
+		 * 
+		 * HttpEntity<ByteArrayResource> attachmentPart; ByteArrayResource
+		 * fileAsResource1 = new ByteArrayResource(file.getBytes()) {
+		 * 
+		 * @Override public String getFilename() { return file.getOriginalFilename(); }
+		 * }; attachmentPart = new HttpEntity<>(fileAsResource1, headers); } catch
+		 * (IOException e) { // TODO Auto-generated catch block e.printStackTrace(); }
+		 */
 
 		/*
 		 * HttpEntity<MultiValueMap<String,Object>> requestEntity = new
@@ -226,8 +244,8 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 		 */
 
 		// logger.info("Checking the response" + responseEntity.getBody().toString());
-		//return null;
-	        
+		// return null;
+
 	}
 
 	public void test() {
