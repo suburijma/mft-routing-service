@@ -3,6 +3,8 @@
  */
 package com.mft.routing.service.impl;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Collections;
 
@@ -12,13 +14,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -30,6 +32,7 @@ import com.mft.routing.dto.SFTPGoUploadDTO;
 import com.mft.routing.request.model.SFTPGoTokenRequest;
 import com.mft.routing.response.SFTPGoTokenResponse;
 import com.mft.routing.service.IMFTRoutingService;
+import com.mft.utility.FileUploadUtil;
 
 /**
  * 
@@ -40,7 +43,7 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 
 	@Value("${sftpgourl}")
 	private String sftpgourl;
-	
+
 	@Autowired
 	private Environment env;
 
@@ -115,43 +118,116 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 	@Override
 	public SFTPGoUploadDTO saveFile(String uploadAPI, String path, boolean mkdir_parents, MultipartFile file) {
 		logger.info("Inside MFT_Routing_ServiceImpl >> saveFile");
-		logger.info("uploadAPI "+ uploadAPI);
+		logger.info("uploadAPI " + uploadAPI);
 
 		SFTPGoTokenRequest tokenRequest = new SFTPGoTokenRequest();
 		tokenRequest.setUserName("user1");
 		tokenRequest.setPassword("Rijma@856411");
 
-		//SFTPGoTokenResponse response = getTokenDetails(tokenRequest);
-		//String authHeader = "Bearer " + response.getAccessToken();
-		//logger.info("authHeader : " + authHeader);
+		SFTPGoTokenResponse response = getTokenDetails(tokenRequest);
+		String authHeader = "Bearer " + response.getAccessToken();
+		logger.info("authHeader : " + authHeader);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-		//headers.setContentType(MediaType.ALL);
 		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-		//headers.set("Authorization", authHeader);
+		// headers.set("Authorization", authHeader);
 		logger.info("Inside MFT_Routing_ServiceImpl >> header");
 
-		String contentType = file.getContentType();
-		Resource files = file.getResource();
+		// changes now
+		FileUploadUtil fileUpload = new FileUploadUtil();
+		File savedFile;
+		ResponseEntity<SFTPGoUploadDTO> responseEntity;
+		try {
+			savedFile = fileUpload.saveFile(file.getName(), file);
+			logger.info("savedFile : " + savedFile.getAbsolutePath());
+			
+			FileSystemResource fileSystemResource = new FileSystemResource(savedFile);
+	        MultiValueMap<String, Object> fileUploadMap = new LinkedMultiValueMap<>();
+	        fileUploadMap.set("file", fileSystemResource);
 
-		MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
-		multipartBodyBuilder.part(file.getName(), files, MediaType.APPLICATION_JSON);
-		logger.info("Inside MFT_Routing_ServiceImpl >> MultipartBodyBuilder");
+	        HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(fileUploadMap, headers);
+	        RestTemplate restTemplate = new RestTemplate();
+	        
+	        
+	        responseEntity = restTemplate.postForEntity(
+	       		 "http://10.28.79.7/api/v2/user/files?path=image3.png&mkdir_parents=false",
+	       		 httpEntity, SFTPGoUploadDTO.class);
+	        logger.info("*********************&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&********************************");
+	        return responseEntity.getBody();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			logger.error("Something Failed@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+			e.printStackTrace();
+		}
+		return null;
+	        
+			
+			
+			
+			
+			
+			
+			
+			
 
-		// multipart/form-data request body
-		MultiValueMap<String, HttpEntity<?>> multipartBody = multipartBodyBuilder.build();
+	/*		ByteArrayResource fileAsResource = new ByteArrayResource(file.getBytes()) {
+				@Override
+				public String getFilename() {
+					return file.getOriginalFilename();
+				}
+			};
 
-		// The complete http request body.
-		HttpEntity<MultiValueMap<String, HttpEntity<?>>> httpEntity = new HttpEntity<>(multipartBody, headers);
+			final MultiValueMap<String, Object> fileUploadMap = new LinkedMultiValueMap<>();
+			fileUploadMap.set("file", fileAsResource);
 
-		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<SFTPGoUploadDTO> responseEntity = restTemplate.postForEntity(
-				"http://10.28.79.7/api/v2/user/files?path=image3.png&mkdir_parents=false", httpEntity,
-				SFTPGoUploadDTO.class);
+			HttpEntity<ByteArrayResource> attachmentPart;
+			ByteArrayResource fileAsResource1 = new ByteArrayResource(file.getBytes()) {
+				@Override
+				public String getFilename() {
+					return file.getOriginalFilename();
+				}
+			};
+			attachmentPart = new HttpEntity<>(fileAsResource1, headers);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
 
-		logger.info("Checking the response" + responseEntity.getBody().toString());
-		return responseEntity.getBody();
+		/*
+		 * HttpEntity<MultiValueMap<String,Object>> requestEntity = new
+		 * HttpEntity<>(attachmentPart,headers);
+		 * 
+		 * RestTemplate restTemplate = new RestTemplate();
+		 * ResponseEntity<SFTPGoUploadDTO> responseEntity = restTemplate.postForEntity(
+		 * "http://10.28.79.7/api/v2/user/files?path=image3.png&mkdir_parents=false",
+		 * httpEntity, SFTPGoUploadDTO.class);
+		 */
+
+		/*
+		 * multipartRequest.set("file",attachmentPart); FileSystemResource fileSys =
+		 * file.getBytes(). String contentType = file.getContentType(); Resource files =
+		 * file.getResource();
+		 * 
+		 * MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
+		 * multipartBodyBuilder.part(file.getName(), files, MediaType.APPLICATION_JSON);
+		 * logger.info("Inside MFT_Routing_ServiceImpl >> MultipartBodyBuilder");
+		 * 
+		 * // multipart/form-data request body MultiValueMap<String, HttpEntity<?>>
+		 * multipartBody = multipartBodyBuilder.build();
+		 * 
+		 * // The complete http request body. HttpEntity<MultiValueMap<String,
+		 * HttpEntity<?>>> httpEntity = new HttpEntity<>(multipartBody, headers);
+		 * 
+		 * RestTemplate restTemplate = new RestTemplate();
+		 * ResponseEntity<SFTPGoUploadDTO> responseEntity = restTemplate.postForEntity(
+		 * "http://10.28.79.7/api/v2/user/files?path=image3.png&mkdir_parents=false",
+		 * httpEntity, SFTPGoUploadDTO.class);
+		 */
+
+		// logger.info("Checking the response" + responseEntity.getBody().toString());
+		//return null;
+	        
 	}
 
 	public void test() {

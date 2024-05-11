@@ -34,7 +34,7 @@ public class MFTRoutingServiceController {
 
 	@Autowired
 	IMFTRoutingService imftRoutingService;
-	
+
 	@Autowired
 	ToolAPIDetail toolAPIDetail;
 
@@ -78,10 +78,23 @@ public class MFTRoutingServiceController {
 
 		String toolName = env.getProperty(userName);
 		String uploadURL = toolAPIDetail.getToolAPI(toolName, MFTRoutingServiceEnum._upload.name());
-		//String uploadAPI = env.getProperty(toolName + ".upload");
+		// String uploadAPI = env.getProperty(toolName + ".upload");
 		logger.info("Upload url >>>>> " + env.getProperty(toolName + ".upload"));
 
 		SFTPGoUploadDTO respone = imftRoutingService.saveFile(uploadURL, path, mkdir_parents, filenames);
+		return null;
+	}
+
+	@PostMapping("/downloadFile")
+	public @ResponseBody SFTPGoUploadDTO downloadFile(@RequestParam("userName") String userName,
+			@RequestParam("fileName") String fileName) {
+		logger.info("Inside MFTRoutingServiceController >> downloadFile");
+
+		String toolName = env.getProperty(userName);
+		String downloadAPI = env.getProperty(toolName + ".upload");
+		logger.info("Upload url >>>>> " + env.getProperty(toolName + ".upload"));
+
+		//imftRoutingService.uploadFiles(uploadAPI, path, mkdir_parents, filenames);
 		return null;
 	}
 
