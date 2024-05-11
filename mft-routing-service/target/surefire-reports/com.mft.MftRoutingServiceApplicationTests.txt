@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.mft.MftRoutingServiceApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.371 s - in com.mft.MftRoutingServiceApplicationTests
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.207 s - in com.mft.MftRoutingServiceApplicationTests

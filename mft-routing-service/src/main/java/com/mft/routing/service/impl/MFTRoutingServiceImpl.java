@@ -68,7 +68,7 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-		// headers.set("Authorization", authHeader);
+		headers.set("Authorization", authHeader);
 		logger.info("Inside MFT_Routing_ServiceImpl >> header");
 
 		// changes now
