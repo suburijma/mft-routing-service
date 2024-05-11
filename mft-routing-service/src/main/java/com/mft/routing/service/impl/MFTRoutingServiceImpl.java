@@ -144,7 +144,7 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 			
 			FileSystemResource fileSystemResource = new FileSystemResource(savedFile);
 	        MultiValueMap<String, Object> fileUploadMap = new LinkedMultiValueMap<>();
-	        fileUploadMap.set("file", fileSystemResource);
+	        fileUploadMap.set("filenames", fileSystemResource);
 
 	        HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(fileUploadMap, headers);
 	        RestTemplate restTemplate = new RestTemplate();
