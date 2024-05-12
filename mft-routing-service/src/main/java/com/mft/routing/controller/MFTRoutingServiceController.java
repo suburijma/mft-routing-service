@@ -88,14 +88,14 @@ public class MFTRoutingServiceController {
 
 	@PostMapping("/downloadFile")
 	public @ResponseBody SFTPGoUploadDTO downloadFile(@RequestParam("userName") String userName,
-			@RequestParam("fileName") String fileName) {
+			@RequestParam(required = false) String inline, @RequestParam("path") String path) {
 		logger.info("Inside MFTRoutingServiceController >> downloadFile");
 
 		String toolName = env.getProperty(userName);
-		String downloadAPI = env.getProperty(toolName + ".upload");
-		logger.info("Upload url >>>>> " + env.getProperty(toolName + ".upload"));
+		String downloadURL = env.getProperty(toolName + ".download");
+		logger.info("Upload url >>>>> " + env.getProperty(toolName + ".download"));
 
-		//imftRoutingService.uploadFiles(uploadAPI, path, mkdir_parents, filenames);
+		imftRoutingService.downloadFile(downloadURL, path, userName, inline);
 		return null;
 	}
 

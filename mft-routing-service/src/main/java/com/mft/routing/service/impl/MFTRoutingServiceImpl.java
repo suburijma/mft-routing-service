@@ -3,11 +3,19 @@
  */
 package com.mft.routing.service.impl;
 
-import java.io.DataInputStream;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.Collections;
 
 import org.apache.commons.net.util.Base64;
@@ -56,6 +64,16 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 	public SFTPGoUploadDTO uploadFiles(String uploadAPI, String path, boolean mkdir_parents, MultipartFile file) {
 		logger.info("Inside MFT_Routing_ServiceImpl >> saveFile");
 		logger.info("uploadAPI " + uploadAPI);
+		
+		
+		FileUploadUtil fileUpload1 = new FileUploadUtil();
+		File savedFile1;
+		try {
+			savedFile1 = fileUpload1.saveFile(file.getName(), file);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		SFTPGoTokenRequest tokenRequest = new SFTPGoTokenRequest();
 		tokenRequest.setUserName("user1");
@@ -93,7 +111,7 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
             RestTemplate restTemplate = new RestTemplate();    
                
 	        responseEntity = restTemplate.postForEntity(
-	       		 "http://10.28.79.7/api/v2/user/files?path=image3.png&mkdir_parents=false",
+	       		 "http://10.28.79.7/api/v2/user/files/upload?path=image6.png&mkdir_parents=false",
 	       		requestEntity, SFTPGoUploadDTO.class);
 	        logger.info("*********************&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&********************************");
 	        return responseEntity.getBody();
@@ -248,8 +266,79 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 
 	}
 
-	public void test() {
+	@Override
+	public String downloadFile(String downloadURL, String path, String userName, String inline) {
 
+		logger.info("Inside MFT_Routing_ServiceImpl >> downloadFile");
+		logger.info("downloadURL :::: " + downloadURL);
+
+		try {
+		SFTPGoTokenRequest tokenRequest = new SFTPGoTokenRequest();
+		tokenRequest.setUserName("user1");
+		tokenRequest.setPassword("Rijma@856411");
+
+		SFTPGoTokenResponse response = getTokenDetails(tokenRequest);
+		String authHeader = "Bearer " + response.getAccessToken();
+		logger.info("authHeader : " + authHeader);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+		headers.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM));
+		headers.set("Authorization", authHeader);
+		
+		logger.info("Inside MFT_Routing_ServiceImpl >> header");
+
+		// changes now
+		String uri = "http://10.28.79.7/api/v2/user/files/upload?path=image6.png";
+        RestTemplate restTemplate = new RestTemplate();  
+
+        
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+
+        logger.info("Inside MFT_Routing_ServiceImpl >> Before restTemplate");
+        ResponseEntity<byte[]> response1 = restTemplate.exchange("http://10.28.79.7/api/v2/user/files/upload?path=image6.png", HttpMethod.GET, entity, byte[].class, "1");
+        logger.info("Inside MFT_Routing_ServiceImpl >> After restTemplate");
+        
+        logger.info("URL link = new URL(\"http://10.28.79.7/api/v2/user/files/upload?path=image6.png");
+        URL link = new URL("http://10.28.79.7/api/v2/user/files/upload?path=image6.png");
+        InputStream in = new BufferedInputStream(link.openStream());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] buf = new byte[1024];
+        int n = 0;
+        while (-1!=(n=in.read(buf)))
+        {
+           out.write(buf, 0, n);
+        }
+        out.close();
+        in.close();
+        byte[] response2 = out.toByteArray();
+        logger.info("new FileOutputStream");
+        
+        FileOutputStream fos = new FileOutputStream("/Documents/temp/"+path);
+        fos.write(response2);
+        fos.close();
+        logger.info("After new FileOutputStream");
+        
+        logger.info("*********************&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&********************************");
+        
+        return "Download successfil";
+              
+               
+		/*
+		 * responseEntity = restTemplate.postForEntity(
+		 * "http://10.28.79.7/api/v2/user/files/upload?path=image6.png&mkdir_parents=false",
+		 * requestEntity, SFTPGoUploadDTO.class);
+		 */
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			logger.error("Something Failed@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+			e.printStackTrace();
+		}
+		return null;
+	        
+	
+		
+		
 	}
 
 }

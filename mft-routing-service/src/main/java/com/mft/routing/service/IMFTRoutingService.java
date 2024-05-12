@@ -24,4 +24,6 @@ public interface IMFTRoutingService {
 
 	SFTPGoUploadDTO uploadFiles(String uploadAPI, String path, boolean mkdir_parents, MultipartFile file);
 
+	String downloadFile(String downloadURL, String path, String userName, String inline);
+
 }

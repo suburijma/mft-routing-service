@@ -32,6 +32,7 @@ public class FileUploadUtil {
             logger.info("Filename is "+fileName);
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
             
+            
             File files = new File("/Files-Upload/"+multipartFile.getOriginalFilename());
             System.out.println(files.getAbsolutePath() + ":::::" +files.getName());
             return files;
