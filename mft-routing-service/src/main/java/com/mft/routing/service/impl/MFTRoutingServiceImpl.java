@@ -42,6 +42,7 @@ import com.mft.routing.dto.SFTPGoUploadDTO;
 import com.mft.routing.request.model.SFTPGoTokenRequest;
 import com.mft.routing.response.SFTPGoTokenResponse;
 import com.mft.routing.service.IMFTRoutingService;
+import com.mft.utility.DownloadUtility;
 import com.mft.utility.FileUploadUtil;
 
 /**
@@ -65,15 +66,9 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 		logger.info("Inside MFT_Routing_ServiceImpl >> saveFile");
 		logger.info("uploadAPI " + uploadAPI);
 		
+		String endPoint = "http://10.28.79.7/api/v2/user/files/upload?path="+file.getOriginalFilename()+"&mkdir_parents=false";
+		logger.info(endPoint);
 		
-		FileUploadUtil fileUpload1 = new FileUploadUtil();
-		File savedFile1;
-		try {
-			savedFile1 = fileUpload1.saveFile(file.getName(), file);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 		SFTPGoTokenRequest tokenRequest = new SFTPGoTokenRequest();
 		tokenRequest.setUserName("user1");
@@ -107,11 +102,12 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 			};
 			data.add("file", resource);
 			
+			
 			HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<MultiValueMap<String, Object>>(data, headers);	
             RestTemplate restTemplate = new RestTemplate();    
                
 	        responseEntity = restTemplate.postForEntity(
-	       		 "http://10.28.79.7/api/v2/user/files/upload?path=image6.png&mkdir_parents=false",
+	        		endPoint,
 	       		requestEntity, SFTPGoUploadDTO.class);
 	        logger.info("*********************&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&********************************");
 	        return responseEntity.getBody();
@@ -289,18 +285,18 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 		logger.info("Inside MFT_Routing_ServiceImpl >> header");
 
 		// changes now
-		String uri = "http://10.28.79.7/api/v2/user/files/upload?path=image6.png";
+		String uri = "http://10.28.79.7/api/v2/user/files?path=image6.png";
         RestTemplate restTemplate = new RestTemplate();  
 
         
         HttpEntity<String> entity = new HttpEntity<String>(headers);
 
         logger.info("Inside MFT_Routing_ServiceImpl >> Before restTemplate");
-        ResponseEntity<byte[]> response1 = restTemplate.exchange("http://10.28.79.7/api/v2/user/files/upload?path=image6.png", HttpMethod.GET, entity, byte[].class, "1");
+        ResponseEntity<byte[]> response1 = restTemplate.exchange("http://10.28.79.7/api/v2/user/files?path=image6.png", HttpMethod.GET, entity, byte[].class, "1");
         logger.info("Inside MFT_Routing_ServiceImpl >> After restTemplate");
         
-        logger.info("URL link = new URL(\"http://10.28.79.7/api/v2/user/files/upload?path=image6.png");
-        URL link = new URL("http://10.28.79.7/api/v2/user/files/upload?path=image6.png");
+        logger.info("URL link = new URL(\"http://10.28.79.7/api/v2/user/files?path=image6.png");
+        URL link = new URL("http://10.28.79.7/api/v2/user/files?path=image6.png");
         InputStream in = new BufferedInputStream(link.openStream());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buf = new byte[1024];
@@ -314,7 +310,7 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
         byte[] response2 = out.toByteArray();
         logger.info("new FileOutputStream");
         
-        FileOutputStream fos = new FileOutputStream("/Documents/temp/"+path);
+        FileOutputStream fos = new FileOutputStream("/Documents/temp/"+"image6.png");
         fos.write(response2);
         fos.close();
         logger.info("After new FileOutputStream");
