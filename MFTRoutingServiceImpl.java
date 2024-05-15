@@ -66,8 +66,8 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 				+ "&mkdir_parents=false";
 		logger.info(endPoint);
 		if(userName.equalsIgnoreCase("mft-axway-2")) {
-			String header = getAXTokenDetails(null, file);
-			logger.info("header " + header);
+			AxwayTokenResponse header = getAXTokenDetails(null, file);
+			logger.info("header " + header.getMessage());
 			return null;
 		}
 
@@ -330,7 +330,7 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 
 	}
 
-	public String getAXTokenDetails(SFTPGoTokenRequest tokenRequest, MultipartFile file) {
+	public AxwayTokenResponse getAXTokenDetails(SFTPGoTokenRequest tokenRequest, MultipartFile file) {
 		logger.info("Inside MFTRoutingServiceImpl >> getTokenDetails");
 		logger.info("==============***************************************====================");
 		logger.info("==============STARTED TOKEN SERVICE====================");
@@ -339,15 +339,14 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 			
 			String auth = "mft-axway-2:test";
 			byte[] encodedAuth = Base64.encodeBase64(auth.getBytes());
-			String authHeader = "Basic " + new String(encodedAuth);
+			String authHeader = "Bearer " + new String(encodedAuth);
 			logger.info("authHeader : " + authHeader);
 
 			HttpHeaders header = new HttpHeaders();
 			header.setContentType(MediaType.APPLICATION_JSON);
 			header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 			header.set("Authorization", authHeader);
-			header.set("Referer", "referer" );
-			header.set("csrfToken", "csrf" );
+			header.setContentType(MediaType.MULTIPART_FORM_DATA);
 
 			HttpEntity<?> req = new HttpEntity<>(header);
 
@@ -371,7 +370,7 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 			// changes now
 			FileUploadUtil fileUpload = new FileUploadUtil();
 			File savedFile;
-			ResponseEntity<SFTPGoUploadDTO> responseEntity;
+			ResponseEntity<AxwayTokenResponse> responseEntity;
 			try {
 				savedFile = fileUpload.saveFile(file.getName(), file);
 				logger.info("savedFile : " + savedFile.getAbsolutePath());
@@ -389,19 +388,15 @@ public class MFTRoutingServiceImpl implements IMFTRoutingService {
 						data, headers);
 				RestTemplate restTemplate = new RestTemplate();
 
-				responseEntity = restTemplate.postForEntity("https://filetransfer-stage.transunion.com/api/v2.0/files?transferMode=BINARY", requestEntity, SFTPGoUploadDTO.class);
+				responseEntity = restTemplate.postForEntity("https://filetransfer-stage.transunion.com/api/v2.0/files/?idp_id=ST_IDP", requestEntity, AxwayTokenResponse.class);
 				logger.info("*********************&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&********************************");
-				//return responseEntity.getBody();
+				return responseEntity.getBody();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				logger.error("Something Failed@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 				e.printStackTrace();
 			}
-			
-			
-			
-
-			return response.getHeaders().REFERER;
+			return null;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
