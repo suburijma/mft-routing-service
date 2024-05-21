@@ -6,8 +6,8 @@ package com.mft.constant;
 /**
  * 
  */
-public final class MFTRoutingServiceConstant {
-	public static final String UPLOAD = "_upload";
-    public static final String DOWNLOAD = "_download";
-    public static final String TOKEN = "_token";
+public  final class MFTRoutingServiceConstant {
+	private static final String UPLOAD = "_upload";
+	private static final String DOWNLOAD = "_download";
+	private static final String TOKEN = "_token";
 }

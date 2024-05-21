@@ -41,13 +41,14 @@ public class MFTRoutingServiceController {
 	@Autowired
 	private Environment env;
 
+	//Testing API
 	@GetMapping("/greet")
 	public @ResponseBody String welcome() {
 		logger.info("Inside MFTRoutingServiceController >> welcome");
-		logger.info(env.getProperty("user1"));
 		return "welcome";
 	}
 
+	//TODO : Authentication mechanism needs to be implemented
 	@PostMapping("/token")
 	public @ResponseBody SFTPGoTokenResponse getToken(@RequestBody(required = true) SFTPGoTokenRequest tokenRequest) {
 		logger.info("Inside MFTRoutingServiceController >> getToken");
@@ -63,11 +64,11 @@ public class MFTRoutingServiceController {
 		logger.info("Inside MFTRoutingServiceController >> uploadFiles");
 
 		String toolName = env.getProperty(userName);
-		String uploadURL = toolAPIDetail.getToolAPI(toolName, MFTRoutingServiceEnum._upload.name());
+		String uploadURL = toolAPIDetail.getToolAPI(toolName, MFTRoutingServiceEnum._upload.name(), env);
 		// String uploadAPI = env.getProperty(toolName + ".upload");
 		logger.info("Upload url >>>>> " + env.getProperty(toolName + ".upload"));
 
-		SFTPGoUploadDTO respone = imftRoutingService.uploadFiles(uploadURL, path, mkdir_parents, filenames);
+		SFTPGoUploadDTO respone = imftRoutingService.uploadFiles(uploadURL, path, mkdir_parents, filenames, userName);
 		return null;
 	}
 
@@ -78,7 +79,7 @@ public class MFTRoutingServiceController {
 		logger.info("Inside MFTRoutingServiceController >> uploadFiles");
 
 		String toolName = env.getProperty(userName);
-		String uploadURL = toolAPIDetail.getToolAPI(toolName, MFTRoutingServiceEnum._upload.name());
+		String uploadURL = toolAPIDetail.getToolAPI(toolName, MFTRoutingServiceEnum._upload.name(), env);
 		// String uploadAPI = env.getProperty(toolName + ".upload");
 		logger.info("Upload url >>>>> " + env.getProperty(toolName + ".upload"));
 

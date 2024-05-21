@@ -2,7 +2,6 @@ package com.mft.utility;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
@@ -10,10 +9,8 @@ import org.springframework.stereotype.Component;
 public class ToolAPIDetail {
 	Logger logger = LoggerFactory.getLogger(ToolAPIDetail.class);
 
-	@Autowired
-	private Environment env;
 	
-	public String getToolAPI(String toolName, String operation) {
+	public String getToolAPI(String toolName, String operation, Environment env) {
 		logger.info("Inside ToolAPIDetail >>>>>getToolAPI ");
 		String toolIP = env.getProperty(toolName+"_ip");
 		logger.info("toolIP >>> " + toolIP);

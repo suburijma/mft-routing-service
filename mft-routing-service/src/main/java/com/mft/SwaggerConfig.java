@@ -23,7 +23,7 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfoMetaData() {
 
-        return new ApiInfoBuilder().title("NAME OF SERVICE")
+        return new ApiInfoBuilder().title("MFT ROUTING SERVICE")
                 .description("API Endpoint Decoration")
                 .license("Apache 2.0")
                 .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")

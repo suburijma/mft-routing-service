@@ -3,13 +3,25 @@
  */
 package com.mft.routing.request.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * 
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SFTPGoUploadRequest {
 
 	private boolean mkdir_parents;
 	private String path;
+	private String userName;
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
 
 	public boolean isMkdir_parents() {
 		return mkdir_parents;

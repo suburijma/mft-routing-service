@@ -22,7 +22,7 @@ public interface IMFTRoutingService {
 
 	SFTPGoUploadDTO saveFile(String uploadAPI, String path, boolean mkdir_parents, MultipartFile filenames);
 
-	SFTPGoUploadDTO uploadFiles(String uploadAPI, String path, boolean mkdir_parents, MultipartFile file);
+	SFTPGoUploadDTO uploadFiles(String uploadAPI, String path, boolean mkdir_parents, MultipartFile file, String userName);
 
 	String downloadFile(String downloadURL, String path, String userName, String inline);
 
